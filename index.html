@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        background-color: rgb(204, 212, 80);
+      }
+      #container {
+        margin: 0px auto;
+        width: 640px;
+        font: 20px Verdana;
+      }
+      #information {
+        text-align: center;
+        margin: 20px;
+      }
+      .text {
+        color: white;
+      }
+      .button {
+        background: rgb(120, 126, 46);
+        color: white;
+        margin: 10px;
+        padding: 5px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      #images div {
+        float: left;
+        width: 100px;
+        height: 100px;
+        margin: 5px;
+        padding: 5px;
+        border: 4px solid green;
+        border-radius: 10px;
+        cursor: pointer;
+        background-color: white;
+      }
+
+      #images div img {
+        width: 100px;
+        height: 100px;
+        display: none;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+      var imgSource = "";
+      var divId = "";
+      var imgFound = 0;
+      var moves = 0;
+      let imageArray = [
+        "images/pic1.jpg",
+        "images/pic2.jpg",
+        "images/pic3.jpg",
+        "images/pic4.jpg",
+        "images/pic5.jpg",
+        "images/pic6.png",
+        "images/pic7.png",
+        "images/pic8.png",
+        "images/pic9.png",
+        "images/pic10.png",
+      ];
+      function ShuffleImages() {
+        var len = imageArray.length * 2;
+        var imgArr = new Array(); //imgArr length is changing, temp Array, not a fixed size array
+        imgArr = $.merge($.merge([], imageArray), imageArray);
+        var currentDiv = $("#images div:first-child");
+
+        for (var i = 0; i < len; i++) {
+          var randomNum = Math.round(Math.random() * (imgArr.length - 1));
+          $("#" + currentDiv.attr("id") + " img").attr(
+            "src",
+            imgArr[randomNum]
+          );
+          imgArr.splice(randomNum, 1);
+          currentDiv = currentDiv.next();
+        }
+      }
+
+      function OpenCard() {
+        var id = $(this).attr("id");
+        if ($("#" + id + " img").is(":hidden")) {
+          $("#" + id + " img").show("slow");
+          if (imgSource == "") {
+            divId = id;
+            imgSource = $("#" + id + " img").attr("src");
+          } else {
+            currentOpened = $("#" + id + " img").attr("src");
+            if (imgSource != currentOpened) {
+              setTimeout(function () {
+                $("#" + id + " img").hide("slow");
+                $("#" + divId + " img").hide("slow");
+                divId = "";
+                imgSource = "";
+              }, 600);
+            } else {
+              divId = "";
+              imgSource = "";
+              imgFound++;
+            }
+          }
+          moves++;
+          $("#moves").html(moves);
+          if (imageArray.length === imgFound) {
+            setTimeout(function () {
+              alert("YES !!! You completed the game with " + moves + " moves");
+            }, 1000);
+          }
+        }
+      }
+      function ResetGame() {
+        ShuffleImages();
+        moves = 0;
+        $("#moves").html(moves);
+        imgFound = 0;
+        imgSource = "";
+        divId = "";
+        $("#images div img").hide();
+      }
+      $(function () {
+        for (let i = 1; i < 3; i++) {
+          // because 20 cards, element index = 10, we have i=1, i = 2.  id = 10, 11,... 19. 20, 21,.... 29.
+          $.each(imageArray, function (index, value) {
+            $("#images").append(
+              "<div id=card" + i + index + "><img src=" + value + " /></div>"
+            );
+          });
+        }
+        ShuffleImages();
+        $("#images div").click(OpenCard);
+      });
+    </script>
+    <title>Memory Game</title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="information">
+        <span class="text">Moves: </span>
+        <span id="moves" class="text">0</span>
+        <a class="button" onclick="ResetGame();">Reset</a>
+      </div>
+      <div id="images"></div>
+    </div>
+  </body>
+</html>
